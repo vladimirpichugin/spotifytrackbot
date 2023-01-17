@@ -8,6 +8,8 @@ services:
     ports:
       - "80:80"
     network_mode: host
+    volumes:
+      - ./docker-data/logs:/usr/src/app/logs
 
 networks:
   default:
