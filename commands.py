@@ -14,6 +14,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, InputTextM
 from spotipy import MemoryCacheHandler
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.oauth2 import SpotifyOauthError
+from spotipy.exceptions import SpotifyException
 from utils import MySpotify
 
 
@@ -111,12 +112,37 @@ def inline_handler(inline_query, bot):
         client['user_info'] = sp.get_me()
         storage.save_client(client)
 
-    now_playing = sp.current_user_playing_track()
+    try:
+        now_playing = sp.current_user_playing_track()
 
-    before_dt = datetime.datetime.now()
-    before_timestamp = int(before_dt.timestamp() * 1000)
+        before_dt = datetime.datetime.now()
+        before_timestamp = int(before_dt.timestamp() * 1000)
 
-    recently_played = sp.current_user_recently_played(limit=9, before=before_timestamp)
+        recently_played = sp.current_user_recently_played(limit=9, before=before_timestamp)
+    except SpotifyException as err:
+        logger.debug('err step A1', exc_info=True)
+        msg = err.msg
+
+        if 'User not registered in the Developer Dashboard' in msg:
+            pass
+
+        return bot.answer_inline_query(
+            inline_query.id,
+            [],
+            is_personal=True,
+            cache_time=1,
+            switch_pm_text='Please authenticate',
+            switch_pm_parameter='love'
+        )
+    except Exception:
+        return bot.answer_inline_query(
+            inline_query.id,
+            [],
+            is_personal=True,
+            cache_time=1,
+            switch_pm_text='Please authenticate',
+            switch_pm_parameter='love'
+        )
 
     items = recently_played.get('items')
     if now_playing and now_playing.get('item'):
