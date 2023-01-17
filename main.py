@@ -129,7 +129,11 @@ def webserver_daemon():
                     f'{d}&error_reason=Exception&error_code=A9&error_description=')
 
         try:
-            bot.send_message(chat_id=client.id, text=L10n.get('linked'))
+            markup = InlineKeyboardMarkup()
+            markup.row(
+                InlineKeyboardButton('Try now', switch_inline_query=' ')
+            )
+            bot.send_message(chat_id=client.id, text=L10n.get('linked'), reply_markup=markup)
         except:
             pass
 
