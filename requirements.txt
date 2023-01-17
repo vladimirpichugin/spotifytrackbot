@@ -1,0 +1,7 @@
+pyTelegramBotAPI==4.2.2
+pymongo
+urllib3==1.26.8
+python-dateutil
+Flask==2.1.0
+blinker
+spotipy
