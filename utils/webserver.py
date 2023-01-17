@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Author: Vladimir Pichugin <vladimir@pichug.in>
-from flask import Flask, request, Response, send_from_directory, abort, request_started, request_finished, got_request_exception, request_tearing_down, make_response
+from flask import Flask, request, redirect, Response, send_from_directory, abort, request_started, request_finished, got_request_exception, request_tearing_down, make_response
 
 import time
 import logging
