@@ -3,6 +3,7 @@
 import logging
 from time import sleep
 
+import flask
 from flask import request
 
 import telebot
@@ -10,6 +11,7 @@ import telebot
 from spotipy import MemoryCacheHandler
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.oauth2 import SpotifyOauthError
+from spotipy.exceptions import SpotifyException
 
 import urllib.parse
 
@@ -46,11 +48,14 @@ def webserver_daemon():
     @app.route("/spotifytrackbot", methods=Settings.WEB_ALLOWED_HTTP_METHODS)
     @app.route("/spotifytrackbot/", methods=Settings.WEB_ALLOWED_HTTP_METHODS)
     def auth():
+        d = 'https://pichug.in/login?error=webapp_error&webapp=spotifytrackbot'
+
         code = request.args.get('code')
         state = request.args.get('state')
 
         if not code or not state:
-            return ws.failed("Wrong parameters were passed. Please try again.", 400)
+            #return ws.failed("Wrong parameters were passed. Please try again.", 400)
+            return flask.redirect(f'{d}&error_reason=auth_problems&error_code=A1&error_description=Wrong parameters were passed. Please try again.')
 
         oauth_context = SpotifyOAuth(
             client_id=Settings.SPOTIFY_CLIENT_ID,
@@ -73,32 +78,63 @@ def webserver_daemon():
             logger.debug(f"{err.error}: {err.error_description}")
 
             if err_desc == "Authorization code expired":
-                return ws.failed(f"Authorize bot again.", 400)
+
+                return flask.redirect(
+                    f'{d}&error_reason=SpotifyOauthError&error_code=A2&error_description=Authorization code expired')
 
             if err_desc == "Invalid authorization code":
-                return ws.failed("Bad Request", 400)
+                return flask.redirect(
+                    f'{d}&error_reason=SpotifyOauthError&error_code=A3&error_description=Invalid authorization code')
 
-            return ws.failed("Auth Problems", 400)
+            return flask.redirect(
+                    f'{d}&error_reason=SpotifyOauthError&error_code=A4&error_description=Auth Problems')
         except:
-            return ws.failed("Auth Problems", 500)
+            return flask.redirect(
+                    f'{d}&error_reason=&error_code=A5&error_description=Auth Problems')
 
         client = storage.get_client_by_key(key=state)
         if not client:
-            return ws.failed("Wrong parameters were passed. Please try again.", 400)
-
-        sp = MySpotify(auth_manager=oauth_context)
-
-        try:
-            client['user_info'] = sp.get_me()
-            sp.current_user_playing_track()
-            sp.current_user_recently_played(limit=1)
-        except:
-            return ws.failed("Wrong parameters were passed. Please try again.", 400)
+            return flask.redirect(
+                    f'{d}&error_reason=client_not_found&error_code=A6&error_description=Client Not Found')
 
         client['spotify_token_info'] = oauth_data
         storage.save_client(client)
 
-        return ws.ok("Spotify authorized. You can close this page.", 200)
+        sp = MySpotify(auth_manager=oauth_context)
+
+        try:
+            user_info = sp.get_me()
+            client['user_info'] = user_info
+
+            sp.current_user_playing_track()
+            sp.current_user_recently_played(limit=1)
+        except SpotifyException as err:
+            msg = err.msg
+
+            if 'User not registered in the Developer Dashboard' in msg:
+                try:
+                    bot.send_message(chat_id=client.id, text=L10n.get('linked_whitelist'))
+                except:
+                    pass
+
+                return flask.redirect(
+                    f'{d}&error_reason=SpotifyException&error_code=A7&error_description=The user must be whitelisted by the developer')
+
+            logger.debug('SpotifyException', exc_info=True)
+            return flask.redirect(
+                    f'{d}&error_reason=SpotifyException&error_code=A8&error_description=')
+        except Exception:
+            logger.debug('Exception, step A9', exc_info=True)
+            return flask.redirect(
+                    f'{d}&error_reason=Exception&error_code=A9&error_description=')
+
+        try:
+            bot.send_message(chat_id=client.id, text=L10n.get('linked'))
+        except:
+            pass
+
+        return flask.redirect(
+            'https://pichug.in/blank?webapp=spotifytrackbot&msg=spotify_authorized')
 
     app.run(
         host=Settings.WEB_HOST,
