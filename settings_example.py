@@ -42,6 +42,5 @@ class Settings:
     MONGO = ''
     MONGO_DATABASE = 'spotifytrackbot'
     COLLECTIONS = {
-        'clients': 'clients',
-        'songs': 'songs'
+        'clients': 'clients'
     }

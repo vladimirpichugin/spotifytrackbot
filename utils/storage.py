@@ -14,7 +14,6 @@ class Storage:
         self.mongo_client = pymongo.MongoClient(connect, authSource='admin')
         self.db = self.mongo_client.get_database(database)
         self.clients = self.db.get_collection(collections.get('clients'))
-        self.songs = self.db.get_collection(collections.get('songs'))
 
     def get_client(self, user: User) -> Client:
         data = self.get_data(self.clients, user.id)
