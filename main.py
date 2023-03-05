@@ -157,7 +157,7 @@ def bot_polling():
                 logger.info("Starting bot polling.")
                 bot.enable_save_next_step_handlers(delay=3)
                 bot.load_next_step_handlers()
-                bot.polling(none_stop=True, interval=Settings.BOT_INTERVAL, timeout=Settings.BOT_TIMEOUT)
+                bot.polling(non_stop=True, interval=Settings.BOT_INTERVAL, timeout=Settings.BOT_TIMEOUT)
             except:
                 logger.error(f"Bot polling failed, restarting in {Settings.BOT_TIMEOUT} sec.", exc_info=True)
                 bot.stop_polling()

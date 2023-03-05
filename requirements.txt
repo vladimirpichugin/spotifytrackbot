@@ -1,4 +1,4 @@
-pyTelegramBotAPI==4.2.2
+pyTelegramBotAPI
 pymongo
 urllib3==1.26.8
 python-dateutil
