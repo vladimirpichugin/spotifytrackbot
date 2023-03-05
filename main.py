@@ -216,3 +216,49 @@ def start(message):
 @bot.inline_handler(func=None)
 def inline(inline_query):
     inline_handler(inline_query=inline_query, bot=bot)
+
+
+@bot.callback_query_handler(func=None)
+def cqh(call):
+    try:
+        call_data = call.data
+        if not call_data:
+            return telebot.CancelUpdate()
+
+        parsed_data = urllib.parse.parse_qs(call_data)
+        for key, value in parsed_data.items():
+            value = value[0]
+            if value == 'y':
+                value = True
+            if value == 'n':
+                value = False
+            parsed_data[key] = value
+
+        track_id = parsed_data.get('track_id')
+        if not track_id:
+            return telebot.CancelUpdate()
+
+        likes = parsed_data.get('like', 0)
+        if not likes:
+            likes = 1
+        if not likes.isdigit():
+            likes = 1
+        likes = int(likes)
+        if likes < 0:
+            likes = 1
+
+        likes_new = likes + 1
+
+        reply_markup = InlineKeyboardMarkup()
+        reply_markup.row(
+            InlineKeyboardButton(f'❤️ {likes}',
+                                 callback_data=f'like={likes_new}&track_id={track_id}'),
+            InlineKeyboardButton('Other', url=f'https://song.link/s/{track_id}'),
+            InlineKeyboardButton('Spotify', url=f'https://open.spotify.com/track/{track_id}')
+        )
+
+        bot.edit_message_reply_markup(inline_message_id=call.inline_message_id, reply_markup=reply_markup)
+        bot.answer_callback_query(callback_query_id=call.id, text='❤️ Like!')
+    except:
+        logger.error('callback handler err', exc_info=True)
+        return telebot.CancelUpdate()

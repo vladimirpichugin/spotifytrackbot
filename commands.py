@@ -164,7 +164,7 @@ def inline_handler(inline_query, bot):
         duration_ms = track.get('duration_ms')
         duration_sec = int(duration_ms / 1000)
 
-        link = track.get('external_urls').get('spotify')
+        #link = track.get('external_urls').get('spotify')
         preview_url = track.get('preview_url')
 
         if preview_url:
@@ -178,8 +178,9 @@ def inline_handler(inline_query, bot):
 
             reply_markup = InlineKeyboardMarkup()
             reply_markup.row(
+                InlineKeyboardButton('❤️', callback_data=f'like=1&track_id={track_id}'),
                 InlineKeyboardButton('Other', url=f'https://song.link/s/{track_id}'),
-                InlineKeyboardButton('Spotify', url=link)
+                InlineKeyboardButton('Spotify', url=f'https://open.spotify.com/track/{track_id}')
             )
 
             line = InlineQueryResultAudio(
@@ -198,8 +199,9 @@ def inline_handler(inline_query, bot):
 
             reply_markup = InlineKeyboardMarkup()
             reply_markup.row(
+                InlineKeyboardButton('❤️', callback_data=f'like=1&track_id={track_id}'),
                 InlineKeyboardButton('Other', url=f'https://song.link/s/{track_id}'),
-                InlineKeyboardButton('Spotify', url=link)
+                InlineKeyboardButton('Spotify', url=f'https://open.spotify.com/track/{track_id}')
             )
 
             line = InlineQueryResultArticle(
