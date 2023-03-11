@@ -159,7 +159,8 @@ def inline_handler(inline_query, bot):
         track_id = track.get('id')
         name = track.get('name')
 
-        performer = track.get('artists')[0].get('name')
+        artists = [artist.get('name') for artist in track.get('artists')]
+        performer = ', '.join(artists)
 
         duration_ms = track.get('duration_ms')
         duration_sec = int(duration_ms / 1000)
