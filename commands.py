@@ -88,20 +88,31 @@ def inline_handler(inline_query, bot):
         cache_handler=cache_handler
     )
 
-    validate_token = oauth_context.validate_token(token_info=spotify_token_info)
+    try:
+        validate_token = oauth_context.validate_token(token_info=spotify_token_info)
+        logger.debug(f'validate_token: {validate_token}')
+    except SpotifyOauthError as err:
+        if 'revoked' in err.error_description:
+            validate_token = False
+    except Exception:
+        logger.error('validate_token error', exc_info=True)
+        validate_token = None
+
     if validate_token:
         cache_handler.save_token_to_cache(validate_token)
 
         client['spotify_token_info'] = validate_token
         storage.save_client(client)
     else:
-        logger.debug(f'validate_token: {validate_token}')
+        client['spotify_token_info'] = None
+        storage.save_client(client)
+
         return bot.answer_inline_query(
             inline_query.id,
             [],
             is_personal=True,
             cache_time=1,
-            switch_pm_text='Please authenticate',
+            switch_pm_text='Please authenticate (token revoked)',
             switch_pm_parameter='authenticate'
         )
 
@@ -152,36 +163,39 @@ def inline_handler(inline_query, bot):
     for item in items:
         track = item.get('track')
 
-        album = track.get('album')
-        images = album.get('images')
-        thumb_url = images[-1].get('url')
+        #album = track.get('album')
+        #images = album.get('images')
+        #logger.debug(images)
+        #thumb_url = images[-1].get('url')
 
         track_id = track.get('id')
         name = track.get('name')
 
-        artists = [artist.get('name') for artist in track.get('artists')]
-        performer = ', '.join(artists)
+        #artists = [artist.get('name') for artist in track.get('artists')[:2]]
+        #performer = ', '.join(artists)
+        performer = track.get('artists')[0].get('name')
 
         duration_ms = track.get('duration_ms')
         duration_sec = int(duration_ms / 1000)
 
-        #link = track.get('external_urls').get('spotify')
         preview_url = track.get('preview_url')
 
-        if preview_url:
-            message_content = InputMediaAudio(
-                thumb=thumb_url,
-                title=name,
-                performer=performer,
-                duration=duration_sec,
-                media=preview_url
-            )
+        message_content = InputMediaAudio(
+            title=name,
+            performer=performer,
+            duration=duration_sec,
+            media=preview_url,
+            #thumb=thumb_url
+        )
 
+        if preview_url:
             reply_markup = InlineKeyboardMarkup()
             reply_markup.row(
-                InlineKeyboardButton('❤️', callback_data=f'like=1&track_id={track_id}'),
-                InlineKeyboardButton('Other', url=f'https://song.link/s/{track_id}'),
-                InlineKeyboardButton('Spotify', url=f'https://open.spotify.com/track/{track_id}')
+                InlineKeyboardButton('❤️ Like!', callback_data=f'like=1&track_id={track_id}')
+            )
+            reply_markup.row(
+                InlineKeyboardButton('🔍 Find Song', url=f'https://song.link/s/{track_id}'),
+                InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}')
             )
 
             line = InlineQueryResultAudio(
@@ -195,14 +209,16 @@ def inline_handler(inline_query, bot):
             )
         else:
             message_content = InputTextMessageContent(
-                message_text=f'{name} - {performer}\n\nError: This song is not available :C'
+                message_text=f'{name} - {performer}\n\nError: This song is not available :c'
             )
 
             reply_markup = InlineKeyboardMarkup()
             reply_markup.row(
-                InlineKeyboardButton('❤️', callback_data=f'like=1&track_id={track_id}'),
-                InlineKeyboardButton('Other', url=f'https://song.link/s/{track_id}'),
-                InlineKeyboardButton('Spotify', url=f'https://open.spotify.com/track/{track_id}')
+                InlineKeyboardButton('❤️ Like!', callback_data=f'like=1&track_id={track_id}')
+            )
+            reply_markup.row(
+                InlineKeyboardButton('🔍 Find Song', url=f'https://song.link/s/{track_id}'),
+                InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}')
             )
 
             line = InlineQueryResultArticle(
@@ -211,7 +227,7 @@ def inline_handler(inline_query, bot):
                 reply_markup=reply_markup,
                 title=name,
                 description=performer,
-                thumb_url=thumb_url
+                #thumb_url=thumb_url
             )
 
         lines.append(line)

@@ -1,6 +1,6 @@
 {
     "hello": "Hello.\nI'll help you share songs you listened on Spotify recently.\n\nPlease link your Spotify account.",
     "linked": "Your account is linked, go share some tracks.\n\nUse /logout to unlink the account.",
-    "linked_whitelist": "Your account is linked, go share some tracks.\n\nThe user must be whitelisted by the developer.\n\nUse /logout to unlink the account.",
+    "linked_whitelist": "Your account is linked, go share some tracks.\n\nThe user must be whitelisted by the developer. Contact developer: @VladimirPichugin\n\nUse /logout to unlink the account.",
     "logout": "Goodbye.\n\nPlease link your Spotify account."
 }

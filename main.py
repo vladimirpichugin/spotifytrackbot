@@ -248,16 +248,20 @@ def cqh(call):
             likes = 1
 
         likes_new = likes + 1
+        likes = f'❤️ {likes} like' if likes == 1 else f'❤️ {likes} likes'
 
         reply_markup = InlineKeyboardMarkup()
         reply_markup.row(
-            InlineKeyboardButton(f'❤️ {likes}',
-                                 callback_data=f'like={likes_new}&track_id={track_id}'),
-            InlineKeyboardButton('Other', url=f'https://song.link/s/{track_id}'),
-            InlineKeyboardButton('Spotify', url=f'https://open.spotify.com/track/{track_id}')
+            InlineKeyboardButton(likes,
+                                 callback_data=f'like={likes_new}&track_id={track_id}')
+        )
+        reply_markup.row(
+            InlineKeyboardButton('🔍 Find Song', url=f'https://song.link/s/{track_id}'),
+            InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}')
         )
 
         bot.edit_message_reply_markup(inline_message_id=call.inline_message_id, reply_markup=reply_markup)
+
         bot.answer_callback_query(callback_query_id=call.id, text='❤️ Like!')
     except:
         logger.error('callback handler err', exc_info=True)
