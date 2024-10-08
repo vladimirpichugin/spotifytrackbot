@@ -1,0 +1,10 @@
+.git/
+docker-data/
+logs/
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+
