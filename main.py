@@ -120,6 +120,11 @@ def webserver_daemon():
                 return flask.redirect(
                     f'{d}&error_reason=SpotifyException&error_code=A7&error_description=The user must be whitelisted by the developer')
 
+            if 'Spotify is unavailable in this country' in msg:
+                return flask.redirect(
+                    f'{d}&error_reason=SpotifyException&error_code=A10&error_description=')
+
+
             logger.debug('SpotifyException', exc_info=True)
             return flask.redirect(
                     f'{d}&error_reason=SpotifyException&error_code=A8&error_description=')
