@@ -38,7 +38,7 @@ def cmd_start(client, user):
         text = L10n.get('linked')
         markup = InlineKeyboardMarkup()
         markup.row(
-            InlineKeyboardButton('Try now', switch_inline_query=' ')
+            InlineKeyboardButton('Попробуй!', switch_inline_query=' ')
         )
     else:
         text = L10n.get('hello')
@@ -74,7 +74,7 @@ def inline_handler(inline_query, bot):
             [],
             is_personal=True,
             cache_time=1,
-            switch_pm_text='Please authenticate',
+            switch_pm_text='Авторизоваться',
             switch_pm_parameter='love'
         )
 
@@ -142,7 +142,7 @@ def inline_handler(inline_query, bot):
             [],
             is_personal=True,
             cache_time=1,
-            switch_pm_text='Please authenticate',
+            switch_pm_text='Авторизоваться',
             switch_pm_parameter='love'
         )
     except Exception:
@@ -151,7 +151,7 @@ def inline_handler(inline_query, bot):
             [],
             is_personal=True,
             cache_time=1,
-            switch_pm_text='Please authenticate',
+            switch_pm_text='Авторизоваться',
             switch_pm_parameter='love'
         )
 
@@ -191,11 +191,11 @@ def inline_handler(inline_query, bot):
         if preview_url:
             reply_markup = InlineKeyboardMarkup()
             reply_markup.row(
-                InlineKeyboardButton('❤️ Like!', callback_data=f'like=1&track_id={track_id}')
+                InlineKeyboardButton('❤️ Лайк!', callback_data=f'like=1&track_id={track_id}')
             )
             reply_markup.row(
-                InlineKeyboardButton('🔍 Find Song', url=f'https://song.link/s/{track_id}'),
-                InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}')
+                InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}'),
+                InlineKeyboardButton('🔍 Другой сервис', url=f'https://song.link/s/{track_id}')
             )
 
             line = InlineQueryResultAudio(
@@ -209,16 +209,16 @@ def inline_handler(inline_query, bot):
             )
         else:
             message_content = InputTextMessageContent(
-                message_text=f'{name} - {performer}\n\nError: This song is not available :c'
+                message_text=f'{name} - {performer}'
             )
 
             reply_markup = InlineKeyboardMarkup()
             reply_markup.row(
-                InlineKeyboardButton('❤️ Like!', callback_data=f'like=1&track_id={track_id}')
+                InlineKeyboardButton('❤️ Лайк!', callback_data=f'like=1&track_id={track_id}')
             )
             reply_markup.row(
-                InlineKeyboardButton('🔍 Find Song', url=f'https://song.link/s/{track_id}'),
-                InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}')
+                InlineKeyboardButton('💚 Spotify', url=f'https://open.spotify.com/track/{track_id}'),
+                InlineKeyboardButton('🔍 Другой сервис', url=f'https://song.link/s/{track_id}')
             )
 
             line = InlineQueryResultArticle(

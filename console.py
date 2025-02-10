@@ -24,6 +24,6 @@ def console_thread():
             if cmd == "help":
                 logger.info("Commands: help")
             else:
-                logger.info("Command not found :C")
+                logger.info("Command not found :c")
         except:
             logger.error("Exception in console", exc_info=True)
