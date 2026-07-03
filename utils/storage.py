@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 # Author: Vladimir Pichugin <vladimir@pichug.in>
 import pymongo
-from bson.objectid import ObjectId
-import datetime
 from telebot.types import User
 
-from utils import logger
 from utils.data import *
+from utils.logging import logger
 
 
 class Storage:
-    def __init__(self, connect, database, collections):
-        self.mongo_client = pymongo.MongoClient(connect, authSource='admin')
+    def __init__(self, connect, database, collections, server_selection_timeout_ms=5000):
+        self.mongo_client = pymongo.MongoClient(
+            connect,
+            serverSelectionTimeoutMS=server_selection_timeout_ms,
+            authSource='admin',
+            tls=True,
+            tlsAllowInvalidCertificates=True,
+            tz_aware=True
+        )
         self.db = self.mongo_client.get_database(database)
         self.clients = self.db.get_collection(collections.get('clients'))
+        self.clients.create_index("key", sparse=True)
 
     def get_client(self, user: User) -> Client:
         data = self.get_data(self.clients, user.id)
@@ -56,6 +62,7 @@ class Storage:
         save_result = self.save_data(self.clients, user.id, client)
 
         if save_result:
+            client.changed = False
             logger.debug(f'Client <{user.id}:{user.username}> saved, result: {save_result}')
             return True
 
@@ -74,11 +81,10 @@ class Storage:
 
     @staticmethod
     def save_data(c: pymongo.collection.Collection, value, data: SDict, name="_id"):
-        if c.find_one({name: value}):
-            operation = c.update_one({name: value}, {"$set": data})
-            result = operation.raw_result if operation else None
-        else:
-            operation = c.insert_one(data)
-            result = operation.inserted_id if operation else None
+        payload = dict(data)
+        payload[name] = value
+
+        operation = c.replace_one({name: value}, payload, upsert=True)
+        result = operation.raw_result if operation else None
 
         return result

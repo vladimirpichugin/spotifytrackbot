@@ -1,4 +1,6 @@
 .git/
+.idea/
+.venv/
 docker-data/
 logs/
 *.log

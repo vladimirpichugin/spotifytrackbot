@@ -1,7 +1,6 @@
-from utils import logger
-from utils import Json
-
 from settings import Settings
+from utils.json import Json
+from utils.logging import logger
 
 
 logger.info("Initializing localization..")

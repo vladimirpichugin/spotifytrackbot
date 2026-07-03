@@ -8,15 +8,16 @@ from settings import Settings
 
 
 def init_logger():
-    l = logging.Logger('spotifytrackbot', level=logging.DEBUG if Settings.DEBUG else logging.INFO)
+    l = logging.getLogger('spotifytrackbot')
+    l.setLevel(logging.DEBUG if Settings.DEBUG else logging.INFO)
+    l.propagate = False
 
-    file_handler = get_logger_file_handler()
-    file_handler.setLevel(logging.DEBUG)
+    for handler in list(l.handlers):
+        l.removeHandler(handler)
 
     stream_handler = get_logger_stream_handler()
     stream_handler.setLevel(level=logging.DEBUG if Settings.DEBUG else logging.INFO)
 
-    l.addHandler(file_handler)
     l.addHandler(stream_handler)
 
     return l
@@ -27,15 +28,6 @@ def get_logger_formatter(
     return logging.Formatter(
         fmt=f,
         datefmt='%d.%m.%y %H:%M:%S')
-
-
-def get_logger_file_handler():
-    pathlib.Path('logs').mkdir(exist_ok=True)
-    file_handler = logging.FileHandler(os.path.join('logs', 'log.txt'), encoding='utf-8')
-
-    file_handler.setFormatter(get_logger_formatter())
-
-    return file_handler
 
 
 def get_logger_stream_handler():

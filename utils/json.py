@@ -2,7 +2,7 @@
 # Author: Vladimir Pichugin <vladimir@pichug.in>
 import json
 
-from utils import logger
+from utils.logging import logger
 
 
 class Json:

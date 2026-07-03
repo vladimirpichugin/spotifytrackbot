@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 # Author: Vladimir Pichugin <vladimir@pichug.in>
-from flask import Flask, request, redirect, Response, send_from_directory, abort, request_started, request_finished, got_request_exception, request_tearing_down, make_response
+from flask import Flask, request, Response, abort, request_started, request_finished, got_request_exception, request_tearing_down
 
-import time
 import logging
-import json
-
-from utils import logger
 
 from settings import Settings
+
+from utils.logging import logger
 
 
 class WebServer:
@@ -18,7 +16,6 @@ class WebServer:
             return Response(
                 response=str(response),
                 status=status,
-                headers=Settings.WEB_HEADERS,
                 content_type=Settings.WEB_CONTENT_TYPE,
                 direct_passthrough=True
             )
@@ -35,7 +32,6 @@ class WebServer:
             return Response(
                 response=str(response),
                 status=status,
-                headers=Settings.WEB_HEADERS,
                 content_type=Settings.WEB_CONTENT_TYPE,
                 direct_passthrough=True
             )

@@ -1,9 +1,10 @@
 services:
   spotifytrackbot:
     build:
+      context: .
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     ports:
-      - "80:32932"
+      - "80:80"
     volumes:
-      - ./docker-data/logs:/usr/src/app/logs
+      - ./docker-data/logs:/app/logs

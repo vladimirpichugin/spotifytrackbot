@@ -1,7 +1,5 @@
 # Spotify Track Bot
-🎶 Use me to share recently played songs.
 
-[![Download](https://img.shields.io/badge/bot-download-blue.svg?logo=github&style=for-the-badge)](https://github.com/vladimirpichugin/spotifytrackbot/archive/master.zip)
+🎶 Telegram bot for sharing recently played Spotify tracks through inline mode.
 
 ![SpotifyTrackBot.jpg](SpotifyTrackBot.jpg)
-

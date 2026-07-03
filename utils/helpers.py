@@ -8,8 +8,7 @@ from settings import Settings
 
 
 def run_threaded(name, func):
-    job_thread = threading.Thread(target=func)
-    job_thread.setName(f'{name}Thread')
+    job_thread = threading.Thread(target=func, name=f'{name}Thread')
     job_thread.start()
 
 
@@ -26,12 +25,11 @@ def get_auth_url(state) -> str:
         'client_id': Settings.SPOTIFY_CLIENT_ID,
         'response_type': 'code',
         'redirect_uri': Settings.SPOTIFY_REDIRECT_URI,
-        'state': state
+        'scope': ' '.join(Settings.SPOTIFY_SCOPE),
+        'state': state,
     }
 
     params_str = urlencode(params)
-
-    params_str += '&scope=' + '+'.join(Settings.SPOTIFY_SCOPE)
 
     url = Settings.SPOTIFY_AUTHORIZE_URI + '?' + params_str
 
